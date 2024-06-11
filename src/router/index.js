@@ -11,7 +11,7 @@ const router = createRouter({
       component: Calendar
     },
     {
-      path: '/reminder',
+      path: '/reminder/:id?',
       name: 'reminder',
       component: Reminder
     }

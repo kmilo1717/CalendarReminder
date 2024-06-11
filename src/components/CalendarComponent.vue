@@ -1,79 +1,125 @@
 <template>
-    <h1 class="mt-4 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-700 md:text-5xl lg:text-6xl">Calendar</h1>
-    <div class="flex w-[90%] mx-auto">
-       <router-link to="/reminder" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">New reminder</router-link>
+  <div>
+    <h1 class="mt-4 mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-700 md:text-5xl lg:text-6xl">Calendar reminder</h1>
+    <div class="flex w-[90%] mx-auto justify-between">
+      <router-link to="/reminder" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">New reminder</router-link>
+      <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" @click="deleteCalendar">Delete all calendar</button>
     </div>
     <div>
       <div class="calendar">
-          <div class="header">
-            
-              <div class="month">Junio 2024</div>
-          </div>
-          <div class="weekdays">
-              <div>Monday</div>
-              <div>Tuesday</div>
-              <div>Wednesday</div>
-              <div>Thursday</div>
-              <div>Friday</div>
-              <div>Saturday</div>
-              <div>Sunday</div>
-          </div>
-          <div class="days">
-              <day v-for="day in days" :key="day" :day="day"></day>
-          </div>
+        <div class="header">
+          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" @click="getPreviousMonth"><<</button>
+          <div class="month capitalize">{{ getMonthDisplayName() }} {{ year }}</div>
+          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" @click="getNextMonth">>></button>
+        </div>
+        <div class="weekdays">
+          <div>Monday</div>
+          <div>Tuesday</div>
+          <div>Wednesday</div>
+          <div>Thursday</div>
+          <div>Friday</div>
+          <div>Saturday</div>
+          <div>Sunday</div>
+        </div>
+        <div class="days">
+          <Day v-for="day in days" :key="day.date" :day="day" :tasks="getTasksForDay(day)"></Day>
+        </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import Day from './DayComponent.vue'
-  export default {
-    name: 'CalendarHandler',
-    components: {
-      Day
-    },
-    data() {
-      return {
-        days: []
+  </div>
+</template>
+
+<script>
+import Day from './DayComponent.vue';
+
+export default {
+  name: 'CalendarHandler',
+  components: {
+    Day,
+  },
+  data() {
+    return {
+      month: 0,
+      year: 0,
+      days: [],
+      tasks: []
+    };
+  },
+  methods: {
+    getCurrentDaysInMonth() {
+      const añoActual = this.year;
+      const mesActual = this.month;
+      const primerDiaMesActual = new Date(añoActual, mesActual, 1);
+      const primerDiaSemana = primerDiaMesActual.getDay() === 0 ? 6 : primerDiaMesActual.getDay() - 1;
+      const primerDiaMesAnterior = new Date(añoActual, mesActual, 0);
+      const ultimoDiaMesAnterior = primerDiaMesAnterior.getDate();
+      const ultimoDiaMesActual = new Date(añoActual, mesActual + 1, 0);
+      const ultimoDiaMes = ultimoDiaMesActual.getDate();
+      const calendario = [];
+
+      for (let i = ultimoDiaMesAnterior - primerDiaSemana + 1; i <= ultimoDiaMesAnterior; i++) {
+        calendario.push({ number: i, isPrevMonth: true, date: this.formatDate(añoActual, mesActual - 1, i) });
       }
+
+      for (let i = 1; i <= ultimoDiaMes; i++) {
+        calendario.push({ number: i, isCurrentMonth: true, date: this.formatDate(añoActual, mesActual, i) });
+      }
+
+      for (let i = 1; calendario.length < 35; i++) { // Asegurar 6 filas de semanas
+        calendario.push({ number: i, isNextMonth: true, date: this.formatDate(añoActual, mesActual + 1, i) });
+      }
+
+      this.days = calendario;
     },
-    methods: {
-      getCurrentDaysInMonth() {
-        const fechaActual = new Date();
-        const añoActual = fechaActual.getFullYear();
-        const mesActual = fechaActual.getMonth();
-        const primerDiaMesActual = new Date(añoActual, mesActual, 1);
-        const primerDiaSemana = primerDiaMesActual.getDay()-1;
-        const primerDiaMesAnterior = new Date(añoActual, mesActual, 0);
-        const ultimoDiaMesAnterior = primerDiaMesAnterior.getDate();
-        const ultimoDiaMesActual = new Date(añoActual, mesActual + 1, 0);
-        const ultimoDiaMes = ultimoDiaMesActual.getDate();
-        const calendario = [];
-  
-        for (let i = ultimoDiaMesAnterior - primerDiaSemana + 1; i <= ultimoDiaMesAnterior; i++) {
-          calendario.push({number:i , 'isPrevMonth': true});
-        }
-  
-        for (let i = 1; i <= ultimoDiaMes; i++) {
-          calendario.push({number:i});
-        }
-  
-        for (let i = 1; calendario.length < 35; i++) { 
-          calendario.push({number:i , 'isNextMonth': true});
-        }
-        
-        this.days = calendario;
-  
-      },
+    formatDate(year, month, day) {
+      const adjustedMonth = month < 0 ? 11 : month > 11 ? 0 : month;
+      const adjustedYear = month < 0 ? year - 1 : month > 11 ? year + 1 : year;
+      return `${adjustedYear}-${String(adjustedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     },
-    mounted() {
+    getTasksForDay(day) {
+      return this.tasks.filter(task => task.date === day.date);
+    },
+    loadTasks() {
+      this.tasks = JSON.parse(localStorage.getItem('reminders')) || [];
+    },
+    deleteCalendar() {
+      localStorage.clear();
+      window.location.reload();
+    },
+    getPreviousMonth() {
+      if (this.month === 0) {
+        this.month = 11;
+        this.year--;
+      } else {
+        this.month--;
+      }
       this.getCurrentDaysInMonth();
+      this.loadTasks();
+    },
+    getNextMonth() {
+      if (this.month === 11) {
+        this.month = 0;
+        this.year++;
+      } else {
+        this.month++;
+      }
+      this.getCurrentDaysInMonth();
+      this.loadTasks();
+    },
+    getMonthDisplayName() {
+      return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(this.year, this.month));
     }
-    
+  },
+  mounted() {
+    const fechaActual = new Date();
+    this.month = fechaActual.getMonth();
+    this.year = fechaActual.getFullYear();
+    this.getCurrentDaysInMonth();
+    this.loadTasks();
   }
-  </script>
+};
+</script>
   
-  <!-- Add "scoped" attribute to limit CSS to this component only -->
   <style scoped>
   template {
       display: flex;
@@ -93,7 +139,7 @@
   
   .header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       background-color: #2196F3;
       color: white;

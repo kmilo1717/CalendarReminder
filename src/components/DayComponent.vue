@@ -1,15 +1,22 @@
 <template>
     <div class="day">
         <p :class="{'prev-month': day.isPrevMonth, 'next-month': day.isNextMonth}">{{day.number}}</p>
-        <div class="tasks">
-            <a href="">Crear una pagina</a>
+        <div class="tasks" v-for="task in tasks" :key="task.id">
+            <router-link class="task" :to="`/reminder/${task.id}`" :style="{'background-color': task.color}">{{ task.time }} - {{ task.description }}</router-link>
         </div>
     </div>
 </template>
+
 <script>
 export default {
-    name: 'DayComponent',
-    props: ['day']
+  name: 'Day',
+  props: {
+    day: Object,
+    tasks: {
+      type: Array,
+      default: () => []
+    }
+  }
 }
 </script>
 <style scoped>
@@ -21,12 +28,11 @@ export default {
         text-align: left;
         margin: 2px 6px;
     }
-    a{
+    .task{
         text-decoration: none;
         color: white;
-        background-color: green;
     }
-    .tasks a{
+    .tasks .task{
         display: block;
         margin: 8px 0;
         padding: 5px;
