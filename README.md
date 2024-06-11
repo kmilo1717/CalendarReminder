@@ -1,35 +1,22 @@
-# calendar-reminder
+# Calendar reminder
 
-This template should help get you started developing with Vue 3 in Vite.
+Descripción corta del proyecto.
 
-## Recommended IDE Setup
+## Requisitos
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Node.js (preferiblemente v14 o superior)
+- npm
 
-## Customize configuration
+## Instalación
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+1. Clona este repositorio: git clone https://github.com/kmilo1717/CalendarReminder.git
+2. Navega al directorio del proyecto: cd calendarreminder
+3. Instala las dependencias usando npm install
 
-## Project Setup
+## Uso
 
-```sh
-npm install
-```
+Para ejecutar el proyecto en modo de desarrollo: npm run dev
 
-### Compile and Hot-Reload for Development
+Esto iniciará el servidor de desarrollo. Abre tu navegador y navega a `http://127.0.0.1:5173/` para ver la aplicación en acción.
 
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
+Para ejecutar las pruebas unitarias: npm run test
