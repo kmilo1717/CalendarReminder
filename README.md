@@ -1,6 +1,6 @@
 # Calendar reminder
 
-Descripción corta del proyecto.
+Calendar Reminder es una aplicación web que te permite organizar tus tareas diarias y recordatorios importantes mediante un calendario interactivo. Con Calendar Reminder, puedes agregar, editar y eliminar recordatorios, establecer fechas y horas específicas.
 
 ## Requisitos
 
